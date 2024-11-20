@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python SQL Magic: List Comprehensions & Data Transformation</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --code-bg: #f8fafc;
+            --border: #e2e8f0;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #1a1a1a;
+        }
+
+        h1 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 2em;
+            color: #333;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        .keyword { color: #7c3aed; }
+        .function { color: #2563eb; }
+        .string { color: #059669; }
+        .comment { color: #64748b; }
+
+        .tip {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .exercise {
+            background: #f0fdf4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #86efac;
+        }
+
+        .solution {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Python SQL Magic: Transforming Query Results Like a Pro 🐍✨</h1>
+
+    <p>
+        Today we're going to explore an elegant Python pattern for handling SQL query results that combines several Pythonic concepts into one powerful technique. This pattern transforms database rows into a more accessible and manageable format.
+    </p>
+
+    <h2>The Code</h2>
+    <p>Let's look at this neat piece of code:</p>
+
+    <pre><span class="keyword">def</span> <span class="function">get_sounds</span>():
+    db = get_db()
+    cursor = db.execute(
+        <span class="string">'SELECT id, filename, key_mapping, category FROM sounds ORDER BY id DESC'</span>
+    )
+    <span class="keyword">return</span> [<span class="function">dict</span>(row) <span class="keyword">for</span> row <span class="keyword">in</span> cursor.fetchall()]</pre>
+
+    <h2>Breaking It Down</h2>
+    
+    <div class="tip">
+        <strong>🔍 Key Concept:</strong> This code transforms database rows into a list of Python dictionaries, where each dictionary represents one row with column names as keys.
+    </div>
+
+    <h3>The Traditional Approach</h3>
+    <p>First, let's look at how we might write this the long way:</p>
+
+    <pre><span class="keyword">def</span> <span class="function">get_sounds_traditional</span>():
+    db = get_db()
+    cursor = db.execute(
+        <span class="string">'SELECT id, filename, key_mapping, category FROM sounds ORDER BY id DESC'</span>
+    )
+    results = []
+    <span class="keyword">for</span> row <span class="keyword">in</span> cursor.fetchall():
+        results.append(<span class="function">dict</span>(row))
+    <span class="keyword">return</span> results</pre>
+
+    <h3>The Magic of dict()</h3>
+    <p>
+        You might be wondering why we use <span class="highlight">dict(row)</span>. Here's what's happening:
+    </p>
+    <ul>
+        <li>Database cursors typically return row objects that are "tuple-like" with additional metadata about column names</li>
+        <li>The <span class="highlight">dict()</span> constructor can convert these row objects into proper Python dictionaries</li>
+        <li>This creates key-value pairs where the column names become keys and the row values become values</li>
+    </ul>
+
+    <div class="tip">
+        <strong>💡 Example:</strong><br>
+        If a row contains: id=1, filename="beep.wav", key_mapping="A1", category="effects"<br>
+        <span class="highlight">dict(row)</span> creates: <br>
+        <pre>{
+    "id": 1,
+    "filename": "beep.wav",
+    "key_mapping": "A1",
+    "category": "effects"
+}</pre>
+    </div>
+
+    <h3>List Comprehension Magic</h3>
+    <p>
+        The square brackets <span class="highlight">[dict(row) for row in cursor.fetchall()]</span> create a list comprehension that:
+    </p>
+    <ol>
+        <li>Fetches all rows from the cursor (<span class="highlight">cursor.fetchall()</span>)</li>
+        <li>Iterates through each row</li>
+        <li>Converts each row to a dictionary</li>
+        <li>Creates a new list containing all these dictionaries</li>
+    </ol>
+
+    <h2>Why This Matters</h2>
+    <p>
+        This pattern is powerful because:
+    </p>
+    <ul>
+        <li>It's more concise and readable than traditional loops</li>
+        <li>The resulting data structure is easy to work with</li>
+        <li>It's a common pattern in web applications and APIs</li>
+        <li>Dictionary access is more explicit than tuple indexing</li>
+    </ul>
+
+    <h2>Exercises</h2>
+
+    <div class="exercise">
+        <h3>Exercise 1: Dictionary Access</h3>
+        <p>Given the following result from get_sounds():</p>
+        <pre>sounds = [
+    {"id": 1, "filename": "drum.wav", "key_mapping": "D1", "category": "drums"},
+    {"id": 2, "filename": "piano.wav", "key_mapping": "P1", "category": "piano"}
+]</pre>
+        <p>Write code to print the filename of the first sound.</p>
+        <button onclick="toggleSolution('solution1')">Show/Hide Solution</button>
+        <div id="solution1" class="solution">
+            <pre><span class="comment"># Solution</span>
+<span class="keyword">print</span>(sounds[0][<span class="string">"filename"</span>])  <span class="comment"># Outputs: "drum.wav"</span></pre>
+        </div>
+    </div>
+
+    <div class="exercise">
+        <h3>Exercise 2: List Comprehension</h3>
+        <p>Using the same sounds list, write a list comprehension that creates a list of all filenames where the category is "drums".</p>
+        <button onclick="toggleSolution('solution2')">Show/Hide Solution</button>
+        <div id="solution2" class="solution">
+            <pre><span class="comment"># Solution</span>
+drum_files = [sound[<span class="string">"filename"</span>] <span class="keyword">for</span> sound <span class="keyword">in</span> sounds 
+             <span class="keyword">if</span> sound[<span class="string">"category"</span>] == <span class="string">"drums"</span>]</pre>
+        </div>
+    </div>
+
+    <script>
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            solution.style.display = solution.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
